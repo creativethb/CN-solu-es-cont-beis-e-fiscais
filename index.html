@@ -1,0 +1,744 @@
+<!-- 
+  INSTRUÇÕES DE EDIÇÃO RÁPIDA:
+  1. Para alterar o link do WhatsApp (CTA), busque por "{{CTA_URL}}" ou vá até a função 'getWhatsAppLink' no final do arquivo.
+  2. As cores podem ser alteradas na configuração do Tailwind no <head> (colors: primary, accent).
+  3. O logo está sendo carregado via URL externa. Para usar local, substitua o src da tag <img>.
+-->
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <title>Recuperação de ITBI — Carine Neves Contadora</title>
+    <meta name="description" content="Recupere valores pagos indevidamente de ITBI. Consultoria especializada baseada em decisão do STJ. Processo administrativo." />
+    <meta name="theme-color" content="#020617" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: '#0F172A', // Slate 900
+                light: '#1E293B',   // Slate 800
+                dark: '#020617',    // Slate 950 (Background)
+              },
+              accent: {
+                DEFAULT: '#D4A528', // Gold
+                light: '#F0C95C',
+                glow: 'rgba(212,165,40,0.35)',
+              },
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              serif: ['Playfair Display', 'serif'],
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              bounceSlow: {
+                '0%, 100%': { transform: 'translateY(-5%)', animationTimingFunction: 'cubic-bezier(0.8, 0, 1, 1)' },
+                '50%': { transform: 'translateY(0)', animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)' },
+              }
+            },
+            animation: {
+              fadeIn: 'fadeIn 0.5s ease-out forwards',
+              bounceSlow: 'bounceSlow 2s infinite',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        -webkit-font-smoothing: antialiased;
+        background-color: #020617;
+        color: #e2e8f0;
+        overflow-x: hidden;
+      }
+      
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #020617; }
+      ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; border: 1px solid #334155; }
+      ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+      /* Animation Utilities */
+      .reveal {
+        opacity: 0;
+        transform: translateY(2rem);
+        transition: all 1s ease-out;
+      }
+      .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .delay-100 { transition-delay: 100ms; }
+      .delay-200 { transition-delay: 200ms; }
+      .delay-300 { transition-delay: 300ms; }
+      .delay-400 { transition-delay: 400ms; }
+
+      /* Tabs Scroll Hide */
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+      /* Print Styles */
+      @media print {
+        body { background-color: white; color: black; }
+        .bg-primary-dark, .bg-primary, .bg-primary\/95 { background-color: white !important; color: black !important; }
+        .text-slate-300, .text-slate-400, .text-slate-500 { color: #333 !important; }
+        .text-white { color: black !important; }
+        .border-white\/5, .border-white\/10 { border-color: #ddd !important; }
+        .no-print { display: none !important; }
+        header { position: static !important; border-bottom: 1px solid #000; }
+        a { text-decoration: underline; color: black; }
+        /* Esconder elementos decorativos pesados */
+        img { opacity: 1 !important; filter: none !important; }
+        .absolute { display: none; } /* Esconde gradientes de fundo */
+        .relative { position: static; }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.574.0"
+  }
+}
+</script>
+</head>
+  <body class="selection:bg-accent selection:text-primary-dark">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 transition-all duration-300 -translate-y-20 opacity-0">
+      <div class="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+        <i data-lucide="check" class="w-3 h-3 text-white"></i>
+      </div>
+      <span class="text-sm font-medium" id="toast-msg">Mensagem</span>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 w-full bg-primary/95 backdrop-blur-md border-b border-white/5 shadow-lg">
+      <div class="container mx-auto max-w-5xl px-6 py-3">
+        <div class="flex items-center justify-center md:justify-start gap-4">
+          <!-- Logo -->
+          <div class="relative flex-shrink-0 w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg overflow-hidden group border border-white/10">
+             <img src="https://raw.githubusercontent.com/atomicgamesbrasil/siteoficial/main/img%20site/neves.jpg" alt="Logo Carine Neves" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+          </div>
+
+          <div class="text-left">
+            <h1 class="text-xl font-bold text-white tracking-wide leading-tight">Carine Neves</h1>
+            <p class="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider font-semibold">Carine Neves — Contadora | Soluções Fiscais e Contábeis</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero -->
+      <section class="relative min-h-[92vh] md:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-primary-dark">
+        <div class="absolute inset-0 z-0">
+          <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600&q=80" alt="Edifícios" class="w-full h-full object-cover opacity-20 filter grayscale contrast-125" />
+          <div class="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary-dark/95 to-primary-dark"></div>
+          <!-- Animated Background Elements -->
+          <div class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-accent/5 rounded-full blur-[120px] animate-pulse"></div>
+          <div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-blue-900/10 rounded-full blur-[100px]"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container mx-auto max-w-4xl px-6 pt-20 pb-20 md:pb-10 relative z-10 text-center flex-grow flex flex-col justify-center">
+          
+          <div class="reveal">
+            <!-- Selo Mobile/Desktop -->
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/5 border border-white/10 text-accent text-[10px] md:text-xs font-bold uppercase tracking-widest mb-6 md:mb-8 hover:bg-white/10 transition-colors cursor-default backdrop-blur-md">
+              <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-accent animate-pulse shadow-[0_0_10px_#d4a528]"></span>
+              Decisão do STJ favorável
+            </div>
+
+            <h1 class="font-serif text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.1] mb-6 md:mb-8">
+              Você pode ter pago <br/>
+              <span class="bg-gradient-to-r from-accent-light via-amber-300 to-amber-600 bg-clip-text text-transparent drop-shadow-sm">ITBI a maior</span>
+            </h1>
+          </div>
+
+          <div class="reveal delay-100">
+            <p class="text-slate-300 text-base md:text-xl max-w-2xl mx-auto mb-10 md:mb-12 leading-relaxed font-light px-2">
+              Se o imposto do seu imóvel foi calculado acima do valor real da compra, você pode ter direito à restituição. Com base em decisão do STJ, é possível recuperar administrativamente os valores pagos a mais nos últimos 5 anos.
+            </p>
+          </div>
+
+          <div class="reveal delay-200">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full md:w-auto">
+              <a 
+                href="#"
+                onclick="openWhatsApp()"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-accent to-accent-light text-primary-dark font-bold text-base md:text-lg px-8 py-4 rounded-full shadow-[0_0_30px_rgba(212,165,40,0.3)] hover:shadow-[0_0_50px_rgba(212,165,40,0.5)] hover:scale-105 transition-all duration-300 cursor-pointer"
+              >
+                Solicitar análise gratuita
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+              </a>
+              <button 
+                onclick="document.getElementById('problem-section').scrollIntoView({behavior: 'smooth'})"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-white/10 text-white font-medium hover:bg-white/5 transition-colors active:bg-white/10"
+              >
+                Entenda o caso
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trust Strip / Footer of Hero -->
+        <div class="w-full relative z-20 mt-auto bg-black/30 backdrop-blur-md border-t border-white/5">
+          <!-- Saiba Mais Indicator -->
+          <div class="absolute -top-12 md:-top-16 left-0 w-full flex flex-col items-center justify-center gap-2 pointer-events-none">
+            <span class="text-[10px] text-slate-400 uppercase tracking-[0.2em] font-medium opacity-80">Saiba mais</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 animate-bounceSlow"></i>
+          </div>
+
+          <div class="container mx-auto max-w-5xl px-4 md:px-6 py-4 md:py-6">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-16">
+               <!-- Item 1 -->
+               <div class="flex items-center gap-3 reveal delay-300">
+                  <div class="w-6 h-6 rounded-full border border-accent/30 bg-accent/5 text-accent flex items-center justify-center">
+                    <i data-lucide="check" class="w-3 h-3"></i>
+                  </div>
+                  <span class="text-slate-200 text-xs md:text-sm font-bold uppercase tracking-widest">Decisão STJ</span>
+               </div>
+               
+               <!-- Separator Mobile (Hidden on Desktop) -->
+               <div class="w-8 h-px bg-white/5 md:hidden"></div>
+               <!-- Separator Desktop (Hidden on Mobile) -->
+               <div class="hidden md:block w-px h-8 bg-white/10"></div>
+
+               <!-- Item 2 -->
+               <div class="flex items-center gap-3 reveal delay-300">
+                  <div class="w-6 h-6 rounded-full border border-accent/30 bg-accent/5 text-accent flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-3 h-3"></i>
+                  </div>
+                  <span class="text-slate-200 text-xs md:text-sm font-bold uppercase tracking-widest">Sem Risco</span>
+               </div>
+
+               <!-- Separator Mobile -->
+               <div class="w-8 h-px bg-white/5 md:hidden"></div>
+               <!-- Separator Desktop -->
+               <div class="hidden md:block w-px h-8 bg-white/10"></div>
+
+               <!-- Item 3 -->
+               <div class="flex items-center gap-3 reveal delay-300">
+                  <div class="w-6 h-6 rounded-full border border-accent/30 bg-accent/5 text-accent flex items-center justify-center">
+                    <i data-lucide="banknote" class="w-3 h-3"></i>
+                  </div>
+                  <span class="text-slate-200 text-xs md:text-sm font-bold uppercase tracking-widest">Só Paga se Receber</span>
+               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Problem Section -->
+      <section id="problem-section" class="py-16 md:py-24 relative overflow-hidden bg-gradient-to-b from-primary-dark to-primary">
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent"></div>
+        <div class="container mx-auto max-w-3xl px-6 relative z-10">
+          <div class="reveal">
+            <div class="mb-12">
+              <div class="flex items-center gap-3 mb-4">
+                <span class="h-0.5 w-8 bg-accent rounded-full"></span>
+                <span class="text-xs font-bold text-accent uppercase tracking-[0.2em]">O Problema</span>
+              </div>
+              <h2 class="font-serif text-3xl md:text-4xl font-bold text-white leading-tight">Cobrança indevida de ITBI</h2>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div class="reveal delay-200">
+              <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/10 relative overflow-hidden group hover:border-accent/30 transition-colors duration-500">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-all"></div>
+                <div class="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mb-6 text-accent border border-accent/20">
+                  <i data-lucide="alert-triangle" class="w-8 h-8 text-accent"></i>
+                </div>
+                <p class="text-base md:text-lg text-slate-300 leading-relaxed font-light">
+                  Muitos municípios aplicaram valores de referência <strong class="text-white font-semibold">superiores ao valor real</strong> da negociação, gerando pagamento indevido do imposto.
+                </p>
+              </div>
+            </div>
+
+            <div class="reveal delay-400">
+              <div class="rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative group h-full">
+                <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80" alt="Documentos" class="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-700" />
+                <div class="absolute inset-0 bg-gradient-to-t from-primary-dark via-primary-dark/50 to-transparent flex items-end p-8">
+                  <p class="text-white font-medium text-sm leading-relaxed border-l-2 border-accent pl-4">Milhares de contribuintes pagaram ITBI a maior sem saber.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Legal Section -->
+      <section class="py-16 md:py-24 bg-primary relative overflow-hidden text-white">
+        <div class="container mx-auto max-w-3xl px-6 relative z-10">
+          <div class="reveal">
+            <div class="mb-10">
+              <span class="text-xs font-bold text-accent uppercase tracking-[0.2em] mb-2 block">Base Legal</span>
+              <h2 class="font-serif text-3xl md:text-4xl font-bold text-white leading-tight">Decisão essencial do STJ</h2>
+            </div>
+          </div>
+          <div class="reveal delay-200">
+            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 md:p-10 mb-8 relative">
+              <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent via-amber-300 to-accent"></div>
+              <div class="w-16 h-16 bg-accent/10 border border-accent/20 rounded-2xl flex items-center justify-center mb-6 text-accent">
+                <i data-lucide="scale" class="w-8 h-8"></i>
+              </div>
+              <blockquote class="text-lg md:text-xl text-slate-200 leading-relaxed border-l-4 border-accent pl-6 italic">
+                “O Superior Tribunal de Justiça (STJ) decidiu que o ITBI deve ser calculado sobre o valor realmente pago na compra. Quando o imposto foi cobrado sobre um valor maior, é possível solicitar a restituição administrativa do que foi pago indevidamente.”
+              </blockquote>
+              <p class="mt-4 text-sm text-slate-400 font-semibold">Referência técnica: STJ — Tema 1.113 / REsp 1.937.821</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Eligibility Section -->
+      <section class="py-16 md:py-24 bg-primary-dark relative">
+        <div class="absolute right-0 top-1/4 w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="container mx-auto max-w-3xl px-6 relative z-10">
+          <div class="reveal">
+            <div class="mb-12">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">Elegibilidade</span>
+              <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mb-4">Quem tem direito</h2>
+              <p class="text-slate-400 text-lg font-light">Verifique se você se enquadra nos critérios para solicitar a restituição.</p>
+            </div>
+          </div>
+          <div class="flex flex-col gap-4">
+             <div class="reveal delay-100">
+               <div class="group bg-white/5 backdrop-blur-sm rounded-xl p-5 md:p-6 shadow-lg border border-white/5 flex items-center gap-4 hover:border-accent/30 hover:bg-white/10 transition-all duration-300">
+                 <div class="w-10 h-10 md:w-12 md:h-12 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0 text-accent group-hover:bg-accent group-hover:text-primary-dark transition-colors">
+                   <i data-lucide="check" class="w-5 h-5"></i>
+                 </div>
+                 <span class="text-base md:text-lg font-medium text-slate-200">Comprou imóvel nos últimos 5 anos</span>
+               </div>
+             </div>
+             <div class="reveal delay-200">
+               <div class="group bg-white/5 backdrop-blur-sm rounded-xl p-5 md:p-6 shadow-lg border border-white/5 flex items-center gap-4 hover:border-accent/30 hover:bg-white/10 transition-all duration-300">
+                 <div class="w-10 h-10 md:w-12 md:h-12 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0 text-accent group-hover:bg-accent group-hover:text-primary-dark transition-colors">
+                   <i data-lucide="check" class="w-5 h-5"></i>
+                 </div>
+                 <span class="text-base md:text-lg font-medium text-slate-200">Pessoa física ou jurídica</span>
+               </div>
+             </div>
+             <div class="reveal delay-300">
+               <div class="group bg-white/5 backdrop-blur-sm rounded-xl p-5 md:p-6 shadow-lg border border-white/5 flex items-center gap-4 hover:border-accent/30 hover:bg-white/10 transition-all duration-300">
+                 <div class="w-10 h-10 md:w-12 md:h-12 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0 text-accent group-hover:bg-accent group-hover:text-primary-dark transition-colors">
+                   <i data-lucide="check" class="w-5 h-5"></i>
+                 </div>
+                 <span class="text-base md:text-lg font-medium text-slate-200">ITBI calculado sobre valor superior ao da compra</span>
+               </div>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Benefits Grid -->
+      <section class="py-16 md:py-24 bg-primary border-t border-white/5">
+        <div class="container mx-auto max-w-4xl px-6">
+          <div class="reveal">
+            <div class="text-center mb-8">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-2 block">Vantagens</span>
+              <h2 class="font-serif text-3xl md:text-4xl font-bold text-white">Benefícios</h2>
+            </div>
+            <!-- Resumo Rápido Centralizado -->
+            <div class="flex justify-center w-full mb-12">
+               <div class="bg-accent/10 border border-accent/20 rounded-full py-2 px-6 inline-block text-center">
+                  <p class="text-accent font-bold text-sm md:text-base">Resumo rápido: Sem custo inicial • Só paga se receber • Cobertura: últimos 5 anos</p>
+               </div>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="reveal delay-100">
+               <div class="bg-white/5 p-8 rounded-2xl shadow-xl border border-white/5 h-full hover:-translate-y-1 transition-transform relative group overflow-hidden">
+                 <div class="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-accent to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                 <div class="w-14 h-14 bg-primary-dark rounded-xl flex items-center justify-center mb-4 text-accent border border-white/5">
+                   <i data-lucide="wallet" class="w-7 h-7"></i>
+                 </div>
+                 <h4 class="text-lg font-bold text-slate-200 mb-2">Recuperação de valores</h4>
+                 <p class="text-slate-400 text-sm">Receba de volta o que foi pago indevidamente.</p>
+               </div>
+            </div>
+            <div class="reveal delay-200">
+               <div class="bg-white/5 p-8 rounded-2xl shadow-xl border border-white/5 h-full hover:-translate-y-1 transition-transform relative group overflow-hidden">
+                 <div class="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-accent to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                 <div class="w-14 h-14 bg-primary-dark rounded-xl flex items-center justify-center mb-4 text-accent border border-white/5">
+                   <i data-lucide="file-text" class="w-7 h-7"></i>
+                 </div>
+                 <h4 class="text-lg font-bold text-slate-200 mb-2">Processo Administrativo</h4>
+                 <p class="text-slate-400 text-sm">Sem custos judiciais iniciais, via administrativa.</p>
+               </div>
+            </div>
+            <div class="reveal delay-300">
+               <div class="bg-white/5 p-8 rounded-2xl shadow-xl border border-white/5 h-full hover:-translate-y-1 transition-transform relative group overflow-hidden">
+                 <div class="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-accent to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                 <div class="w-14 h-14 bg-primary-dark rounded-xl flex items-center justify-center mb-4 text-accent border border-white/5">
+                   <i data-lucide="piggy-bank" class="w-7 h-7"></i>
+                 </div>
+                 <h4 class="text-lg font-bold text-slate-200 mb-2">Dinheiro ou Compensação</h4>
+                 <p class="text-slate-400 text-sm">Receba em conta ou abata do IPTU futuro.</p>
+               </div>
+            </div>
+            <div class="reveal delay-400">
+               <div class="bg-white/5 p-8 rounded-2xl shadow-xl border border-white/5 h-full hover:-translate-y-1 transition-transform relative group overflow-hidden">
+                 <div class="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-accent to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                 <div class="w-14 h-14 bg-primary-dark rounded-xl flex items-center justify-center mb-4 text-accent border border-white/5">
+                   <i data-lucide="shield" class="w-7 h-7"></i>
+                 </div>
+                 <h4 class="text-lg font-bold text-slate-200 mb-2">Segurança Jurídica</h4>
+                 <p class="text-slate-400 text-sm">Tese consolidada pelo STJ.</p>
+               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stepper Section (Interactive) -->
+      <section class="py-16 md:py-24 bg-primary-dark relative overflow-hidden" id="stepper-section">
+        <div class="absolute top-0 right-[-10%] w-[400px] h-[400px] bg-accent/5 rounded-full filter blur-3xl opacity-50"></div>
+        <div class="container mx-auto max-w-4xl px-6 relative z-10">
+          <div class="reveal">
+            <div class="mb-12">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-2 block">Passo a Passo</span>
+              <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mb-4">Como funciona</h2>
+              <p class="text-slate-400 font-light">Entenda as etapas do processo de recuperação.</p>
+            </div>
+          </div>
+          
+          <div class="bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
+            <!-- Tabs -->
+            <div id="stepper-tabs" class="flex overflow-x-auto scrollbar-hide border-b border-white/5"></div>
+            <!-- Content -->
+            <div class="p-8 md:p-12 min-h-[250px] flex items-center relative">
+               <div class="flex flex-col md:flex-row items-start gap-6 w-full animate-fadeIn" id="stepper-content-anim">
+                  <div id="step-number" class="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center text-primary-dark font-serif font-bold text-2xl shadow-lg shadow-accent/20 flex-shrink-0 border border-white/20">1</div>
+                  <div>
+                     <h3 id="step-title" class="text-xl font-bold text-white mb-3">...</h3>
+                     <p id="step-desc" class="text-slate-300 leading-relaxed text-lg font-light">...</p>
+                  </div>
+               </div>
+            </div>
+            <!-- Navigation -->
+            <div class="bg-black/20 px-6 py-4 flex justify-between items-center border-t border-white/5">
+               <button id="step-prev" class="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-white transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i> Anterior</button>
+               <button id="step-next" class="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-white transition-colors">Próxima <i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Documents Section (Unified) -->
+      <section class="py-16 md:py-24 bg-primary">
+        <div class="container mx-auto max-w-4xl px-6">
+          <div class="reveal">
+            <div class="mb-12 text-center">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-2 block">Documentação</span>
+              <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mb-4">O que eu preciso trazer</h2>
+              <p class="text-slate-400 font-light">Envie os documentos abaixo via WhatsApp para iniciarmos a análise.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            <!-- Doc 1 -->
+            <div class="reveal delay-100">
+              <div class="bg-white/5 p-8 rounded-xl border border-white/5 flex flex-col items-center text-center shadow-lg hover:shadow-accent/5 hover:border-accent/30 hover:bg-white/10 transition-all duration-300 group h-full">
+                <div class="w-16 h-16 bg-primary-dark rounded-xl flex items-center justify-center text-accent mb-6 border border-white/5 group-hover:scale-110 transition-transform">
+                  <i data-lucide="scroll-text" class="w-8 h-8"></i>
+                </div>
+                <span class="font-bold text-white mb-1">Contrato de compra e venda</span>
+                <span class="text-xs text-slate-400 font-normal">(com o valor declarado)</span>
+              </div>
+            </div>
+            <!-- Doc 2 -->
+            <div class="reveal delay-200">
+              <div class="bg-white/5 p-8 rounded-xl border border-white/5 flex flex-col items-center text-center shadow-lg hover:shadow-accent/5 hover:border-accent/30 hover:bg-white/10 transition-all duration-300 group h-full">
+                <div class="w-16 h-16 bg-primary-dark rounded-xl flex items-center justify-center text-accent mb-6 border border-white/5 group-hover:scale-110 transition-transform">
+                  <i data-lucide="receipt" class="w-8 h-8"></i>
+                </div>
+                <span class="font-bold text-white mb-1">Guia/recibo do ITBI</span>
+                <span class="text-xs text-slate-400 font-normal">(comprovante de pagamento)</span>
+              </div>
+            </div>
+            <!-- Doc 3 -->
+            <div class="reveal delay-300">
+              <div class="bg-white/5 p-8 rounded-xl border border-white/5 flex flex-col items-center text-center shadow-lg hover:shadow-accent/5 hover:border-accent/30 hover:bg-white/10 transition-all duration-300 group h-full">
+                <div class="w-16 h-16 bg-primary-dark rounded-xl flex items-center justify-center text-accent mb-6 border border-white/5 group-hover:scale-110 transition-transform">
+                  <i data-lucide="home" class="w-8 h-8"></i>
+                </div>
+                <span class="font-bold text-white mb-1">Escritura ou matrícula</span>
+                <span class="text-xs text-slate-400 font-normal">do imóvel</span>
+              </div>
+            </div>
+            <!-- Doc 4 -->
+            <div class="reveal delay-400">
+              <div class="bg-white/5 p-8 rounded-xl border border-white/5 flex flex-col items-center text-center shadow-lg hover:shadow-accent/5 hover:border-accent/30 hover:bg-white/10 transition-all duration-300 group h-full">
+                <div class="w-16 h-16 bg-primary-dark rounded-xl flex items-center justify-center text-accent mb-6 border border-white/5 group-hover:scale-110 transition-transform">
+                  <i data-lucide="user-square-2" class="w-8 h-8"></i>
+                </div>
+                <span class="font-bold text-white mb-1">Documento (CPF/RG)</span>
+                <span class="text-xs text-slate-400 font-normal">ou societários (se PJ)</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="reveal delay-500">
+             <div class="text-center">
+               <p class="text-accent font-bold">Envie por WhatsApp — nós cuidamos do resto.</p>
+             </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Pricing Section -->
+      <section class="py-16 md:py-20 relative overflow-hidden bg-primary-dark">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px]"></div>
+        <div class="container mx-auto max-w-3xl px-6 relative z-10">
+          <div class="reveal">
+            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-14 text-center relative overflow-hidden">
+              <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent via-white to-accent"></div>
+              <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-bold uppercase tracking-widest mb-8">
+                <i data-lucide="sparkles" class="w-3 h-3"></i> Honorários
+              </div>
+              <div class="mb-4">
+                <span class="font-serif text-5xl md:text-8xl font-black bg-gradient-to-br from-accent-light to-amber-600 bg-clip-text text-transparent">
+                  20<span class="text-4xl align-super">%</span>
+                </span>
+              </div>
+              <p class="text-slate-300 text-lg md:text-xl mb-8">sobre o valor efetivamente recuperado</p>
+              <div class="inline-flex items-center gap-3 bg-white/5 border border-white/10 text-emerald-400 px-6 py-3 rounded-full font-bold text-sm md:text-base">
+                <i data-lucide="check" class="w-5 h-5"></i>
+                Sem custo inicial
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Partnership Section -->
+      <section class="py-16 md:py-24 bg-primary border-t border-white/5">
+        <div class="container mx-auto max-w-4xl px-6">
+          <div class="reveal">
+            <div class="mb-12">
+               <span class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-2 block">Parceria</span>
+               <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mb-2">Parceria com imobiliária</h2>
+               <p class="text-slate-400 font-light">Canal de receita sem investimento.</p>
+            </div>
+          </div>
+          <div class="flex flex-col gap-4">
+            <div class="reveal delay-100">
+              <div class="bg-primary-dark/50 p-6 rounded-xl shadow-lg border border-white/5 flex items-center gap-4 hover:border-accent/30 transition-all duration-300">
+                <div class="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center text-accent flex-shrink-0">
+                  <i data-lucide="handshake" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-200 text-lg">Contrato sem exclusividade</h4>
+                </div>
+              </div>
+            </div>
+            <div class="reveal delay-200">
+              <div class="bg-primary-dark/50 p-6 rounded-xl shadow-lg border border-white/5 flex items-center gap-4 hover:border-accent/30 transition-all duration-300">
+                <div class="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center text-accent flex-shrink-0">
+                  <i data-lucide="trending-up" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-200 text-lg">Repasse de 30% dos honorários</h4>
+                  <p class="text-slate-500 text-sm mt-1">6% do valor total recuperado</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="py-16 bg-primary-dark">
+         <div class="container mx-auto max-w-3xl px-6">
+            <div class="reveal">
+               <div class="mb-12">
+                  <span class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-2 block">Dúvidas Frequentes</span>
+                  <h2 class="font-serif text-3xl md:text-4xl font-bold text-white mb-2">Perguntas comuns</h2>
+               </div>
+            </div>
+            <div class="space-y-4">
+               <div class="reveal delay-100">
+                  <div class="bg-white/5 rounded-xl p-6 border border-white/5">
+                     <h4 class="font-bold text-white text-lg mb-2">Quanto tempo leva?</h4>
+                     <p class="text-slate-400 font-light">Preparação e protocolo: ~30–60 dias. A análise da prefeitura varia por município.</p>
+                  </div>
+               </div>
+               <div class="reveal delay-200">
+                  <div class="bg-white/5 rounded-xl p-6 border border-white/5">
+                     <h4 class="font-bold text-white text-lg mb-2">Preciso entrar na justiça?</h4>
+                     <p class="text-slate-400 font-light">Não inicialmente — buscamos a restituição por via administrativa com base no STJ.</p>
+                  </div>
+               </div>
+               <div class="reveal delay-300">
+                  <div class="bg-white/5 rounded-xl p-6 border border-white/5">
+                     <h4 class="font-bold text-white text-lg mb-2">Quanto custa?</h4>
+                     <p class="text-slate-400 font-light">Honorários de êxito: 20% do valor recuperado. Sem custo inicial — você só paga se receber.</p>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="relative py-24 flex items-center justify-center overflow-hidden bg-primary-dark text-center no-print">
+         <div class="absolute inset-0 z-0">
+           <img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=1200&q=80" alt="Cidade" class="w-full h-full object-cover opacity-10" />
+           <div class="absolute inset-0 bg-gradient-to-t from-primary-dark via-primary/90 to-primary/80"></div>
+         </div>
+         <div class="container mx-auto max-w-3xl px-6 relative z-10">
+           <div class="reveal">
+             <h2 class="font-serif text-4xl md:text-5xl font-extrabold text-white mb-6">
+               Recupere o que é <span class="text-accent">seu por direito</span>
+             </h2>
+             <p class="text-slate-300 text-lg mb-10 max-w-xl mx-auto">Solicite agora sua análise gratuita.</p>
+           </div>
+           <div class="reveal delay-200">
+             <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+               <a 
+                  href="#"
+                  onclick="openWhatsApp()"
+                  class="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-accent to-accent-light text-primary-dark font-bold text-lg px-8 py-4 rounded-full shadow-[0_0_30px_rgba(212,165,40,0.3)] hover:scale-105 transition-transform"
+               >
+                  Iniciar agora <i data-lucide="chevron-right" class="w-5 h-5"></i>
+               </a>
+             </div>
+           </div>
+         </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-primary-dark border-t border-white/5 py-10 text-center text-slate-500 text-sm">
+        <div class="container mx-auto px-6">
+          <div class="flex flex-col items-center gap-4 mb-6">
+             <div class="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center shadow-md bg-white border border-white/10">
+                <img src="https://raw.githubusercontent.com/atomicgamesbrasil/siteoficial/main/img%20site/neves.jpg" alt="Logo" class="w-full h-full object-cover" />
+             </div>
+             <strong class="text-white text-lg">Carine Neves</strong>
+          </div>
+          <p>Contato: +55 83 8816-3167 • carine.cneves@gmail.com</p>
+          <p class="mt-8 text-xs opacity-50">&copy; <span id="year"></span> Carine Neves. Todos os direitos reservados.</p>
+        </div>
+      </footer>
+    </main>
+
+    <!-- Scripts -->
+    <script>
+      lucide.createIcons();
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      function getWhatsAppLink() {
+        // Mensagem Pré-preenchida
+        return "https://wa.me/558388163167?text=Ol%C3%A1%20Carine%2C%20gostaria%20de%20uma%20an%C3%A1lise%20gratuita%20do%20ITBI.%20Meu%20nome%3A%20%5BSeu%20Nome%5D%20%7C%20Im%C3%B3vel%20comprado%3A%20%5BM%C3%AAs%20%2FAno%5D%20%7C%20Cidade%3A%20%5BCidade%5D";
+      }
+
+      function openWhatsApp() {
+        window.open(getWhatsAppLink(), '_blank');
+      }
+
+      function copyLink() {
+        navigator.clipboard.writeText(getWhatsAppLink()).then(() => {
+          const toast = document.getElementById('toast');
+          document.getElementById('toast-msg').textContent = "Link copiado!";
+          toast.classList.remove('-translate-y-20', 'opacity-0');
+          toast.classList.add('translate-y-0', 'opacity-100');
+          setTimeout(() => {
+            toast.classList.add('-translate-y-20', 'opacity-0');
+            toast.classList.remove('translate-y-0', 'opacity-100');
+          }, 3000);
+        });
+      }
+
+      // Scroll Reveal
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+      // Stepper Logic
+      const steps = [
+        { num: "1", title: "Envio dos documentos", desc: "Você nos envia contrato, guia do ITBI e matrícula do imóvel — nós analisamos." },
+        { num: "2", title: "Verificação do valor", desc: "Comparamos o valor cobrado pela prefeitura com o valor real da venda." },
+        { num: "3", title: "Cálculo do crédito", desc: "Calculamos o quanto foi pago a mais e preparamos o pedido técnico." },
+        { num: "4", title: "Protocolo administrativo", desc: "Protocolamos o pedido na prefeitura com base na decisão do STJ." },
+        { num: "5", title: "Restituição / Compensação", desc: "A prefeitura restitui em dinheiro ou autoriza compensação com IPTU." }
+      ];
+      let activeStep = 0;
+      let interval;
+
+      function updateStepper() {
+        const tabs = document.getElementById('stepper-tabs');
+        tabs.innerHTML = steps.map((s, i) => `
+          <button onclick="setStep(${i})" class="flex-1 min-w-[80px] py-4 px-2 flex flex-col items-center relative transition-colors ${i === activeStep ? 'bg-white/5' : 'opacity-60 hover:opacity-100'}">
+            <span class="text-lg font-bold ${i === activeStep ? 'text-accent' : 'text-slate-500'}">${s.num}</span>
+            <span class="text-[10px] font-bold uppercase ${i === activeStep ? 'text-white' : 'text-slate-600'}">Etapa</span>
+            ${i === activeStep ? '<div class="absolute bottom-0 w-full h-0.5 bg-accent"></div>' : ''}
+          </button>
+        `).join('');
+        
+        document.getElementById('step-number').textContent = steps[activeStep].num;
+        document.getElementById('step-title').textContent = steps[activeStep].title;
+        document.getElementById('step-desc').textContent = steps[activeStep].desc;
+        
+        // Anim restart
+        const anim = document.getElementById('stepper-content-anim');
+        anim.classList.remove('animate-fadeIn');
+        void anim.offsetWidth; 
+        anim.classList.add('animate-fadeIn');
+
+        // Nav buttons
+        document.getElementById('step-prev').disabled = activeStep === 0;
+        document.getElementById('step-prev').style.opacity = activeStep === 0 ? '0.3' : '1';
+        document.getElementById('step-next').disabled = activeStep === steps.length - 1;
+        document.getElementById('step-next').style.opacity = activeStep === steps.length - 1 ? '0.3' : '1';
+      }
+
+      function setStep(i) {
+        activeStep = i;
+        clearInterval(interval);
+        updateStepper();
+        startInterval();
+      }
+
+      function startInterval() {
+        interval = setInterval(() => {
+          activeStep = activeStep < steps.length - 1 ? activeStep + 1 : 0;
+          updateStepper();
+        }, 5000);
+      }
+
+      document.getElementById('step-prev').onclick = () => activeStep > 0 && setStep(activeStep - 1);
+      document.getElementById('step-next').onclick = () => activeStep < steps.length - 1 && setStep(activeStep + 1);
+
+      updateStepper();
+      startInterval();
+    </script>
+  </body>
+</html>
